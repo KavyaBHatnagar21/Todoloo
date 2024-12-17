@@ -1,0 +1,95 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Delius", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: center; */
+  /* height: 100vh; */
+  margin-top: 100px;
+}
+
+.add-item {
+  display: flex;
+  /* justify-content: space-evenly; */
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #fddbbb;
+  margin-bottom: 10px;
+  /* width: 200px;
+  height: 100px; */
+}
+
+.input-box {
+  width: 290px;
+  height: 50px;
+  border-radius: 10px;
+  border: none;
+  padding: 10px;
+  border: #fddbbb;
+}
+
+.add-button {
+  width: 80px;
+  height: 50px;
+  border-radius: 10px;
+  border: none;
+  background-color: #cb9df0;
+}
+
+.todo-list-container {
+  background-color: #fff9bf;
+  width: 400px;
+  min-height: 300px;
+  padding: 30px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+}
+
+.add-button {
+  cursor: pointer;
+  transition: all 0.3;
+}
+
+.add-button:hover {
+  background-color: #cdc1ff;
+  color: whitesmoke;
+}
+
+ul {
+  list-style: none;
+}
+
+ul li {
+  margin-bottom: 1.2rem;
+}
+
+.box-img {
+  background-image: url(./images/unchecked-box.png);
+  background-size: cover;
+  width: 20px;
+  height: 20px;
+}
+
+.box-and-item-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.completed {
+  text-decoration: line-through;
+  color: gray;
+}
