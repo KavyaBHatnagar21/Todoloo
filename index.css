@@ -8,6 +8,12 @@ body {
   font-family: "Delius", cursive;
   font-weight: 400;
   font-style: normal;
+  /* background-image: url(./images/cute-bg.jpg); */
+  background: linear-gradient(rgb(191, 236, 255, 0.5), rgb(191, 236, 255, 0.5)),
+    url(./images/cute-bg.jpg);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 main {
@@ -27,8 +33,6 @@ main {
   border-radius: 10px;
   background-color: #fddbbb;
   margin-bottom: 10px;
-  /* width: 200px;
-  height: 100px; */
 }
 
 .input-box {
@@ -38,6 +42,9 @@ main {
   border: none;
   padding: 10px;
   border: #fddbbb;
+  background-color: #fff6e3;
+  outline-style: none;
+  font: inherit;
 }
 
 .add-button {
@@ -45,18 +52,20 @@ main {
   height: 50px;
   border-radius: 10px;
   border: none;
-  background-color: #cb9df0;
+  background-color: #cdc1ff;
+  box-shadow: inset 2px 2px #ffccea;
 }
 
 .todo-list-container {
   background-color: #fff9bf;
   width: 400px;
-  min-height: 300px;
+  height: 430px;
   padding: 30px;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
+  overflow: scroll;
+  overflow-x: hidden;
 }
 
 .add-button {
@@ -65,8 +74,8 @@ main {
 }
 
 .add-button:hover {
-  background-color: #cdc1ff;
-  color: whitesmoke;
+  background-color: #cdc9ff;
+  transition: all 0.5s;
 }
 
 ul {
@@ -84,11 +93,36 @@ ul li {
   height: 20px;
 }
 
+.bin-img {
+  width: 20px;
+  height: 20px;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
 .box-and-item-container {
   display: flex;
   gap: 0.5rem;
 }
 
+.item-container {
+  display: flex;
+  justify-content: space-between;
+  background-color: #cdc1ff;
+  margin-bottom: 0.5rem;
+  padding: 10px 10px 0 10px;
+  border-radius: 10px;
+  border: none;
+  box-shadow: inset 2px 2px #ffccea;
+  cursor: pointer;
+}
+
+.item-container:hover {
+  background-color: #cdc9ff;
+  transition: all 0.5s;
+}
 .completed {
   text-decoration: line-through;
   color: gray;
