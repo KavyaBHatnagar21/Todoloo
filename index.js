@@ -1,34 +1,62 @@
 "use strict"
 
-const todoList = document.querySelector(".todo-list")
-const todoListContainer = document.querySelector(".todo-list-container")
-const inputBox = document.querySelector(".input-box")
-const addButton = document.querySelector(".add-button")
+// DOM Elements
+const $todoList = document.querySelector(".todo-list")
+const $todoListContainer = document.querySelector(".todo-list-container")
+const $inputBox = document.querySelector(".input-box")
+const $addButton = document.querySelector(".add-button")
 
-let tasks = []
+// App constants
 
-document.addEventListener("DOMContentLoaded", function () {
-  retrieveItems()
-})
+const DB_NAME = "tasks"
 
-//Update task array and add that to the local storage
-const addItems = () => {
-  const newTask = inputBox.value
-  if (newTask === "") return
-  tasks.push({ text: newTask, completed: false })
+// Data structures
 
-  localStorage.setItem("tasks", JSON.stringify(tasks))
+let tasks = ["kavya"]
 
-  inputBox.value = ""
+// App logic
+
+// Data strcutures logic
+
+const addToTaskList = (tasks, text, completed = false) =>
+  tasks.push({ text, completed })
+
+// Database logic
+
+const updateDB = (dbName, tasks) =>
+  localStorage.setItem(dbName, JSON.stringify(tasks))
+
+const loadTasksFromDB = (dbName, tasks) => {
+  console.log(tasks)
+
+  tasks = JSON.parse(localStorage.getItem("tasks")) || []
+  console.log("json parse", JSON.parse(localStorage.getItem(dbName)))
+}
+
+// UI logic
+
+const getInputBoxValue = () => $inputBox.value
+
+const isInputBoxEmpty = () => getInputBoxValue() === ""
+
+const clearInputBox = () => ($inputBox.value = "")
+
+const addItems = (tasks, dbName) => {
+  if (!isInputBoxEmpty()) {
+    addToTaskList(tasks, getInputBoxValue())
+    clearInputBox()
+    updateDB(dbName, tasks)
+  }
 }
 
 //Retrieve old tasks and display tasks and retrieve updated tasks
+
 const retrieveItems = () => {
   tasks = JSON.parse(localStorage.getItem("tasks")) || []
 
-  todoList.innerHTML = ""
+  $todoList.innerHTML = ""
   tasks.forEach((task, index) => {
-    todoList.innerHTML += `
+    $todoList.innerHTML += `
     <div class="item-container">
         <div class="box-and-item-container">
             <img src="./images/${
@@ -59,6 +87,7 @@ const deleteTask = () => {
       const index = img.dataset.index
       tasks.splice(index, 1)
       localStorage.setItem("tasks", JSON.stringify(tasks))
+      loadTasksFromDB(DB_NAME, tasks)
       retrieveItems()
     })
   })
@@ -188,19 +217,33 @@ const checkTheBox = () => {
       const index = img.dataset.index
       tasks[index].completed = !tasks[index].completed
       localStorage.setItem("tasks", JSON.stringify(tasks))
+      loadTasksFromDB(DB_NAME, tasks)
+
       retrieveItems()
     })
   })
 }
 
-addButton.addEventListener("click", () => {
-  addItems()
+// Event Listeners
+
+document.addEventListener("DOMContentLoaded", function () {
+  loadTasksFromDB(DB_NAME, tasks)
+
   retrieveItems()
 })
 
-inputBox.addEventListener("keydown", (event) => {
+$addButton.addEventListener("click", () => {
+  addItems(tasks, DB_NAME)
+  loadTasksFromDB(DB_NAME, tasks)
+
+  retrieveItems()
+})
+
+$inputBox.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
-    addItems()
+    addItems(tasks, DB_NAME)
+    loadTasksFromDB(DB_NAME, tasks)
+
     retrieveItems()
   }
 })
