@@ -12,11 +12,11 @@ const DB_NAME = "tasks"
 
 // Data structures
 
-let tasks = ["kavya"]
+let tasks = []
 
 // App logic
 
-// Data strcutures logic
+// Data structures logic
 
 const addToTaskList = (tasks, text, completed = false) =>
   tasks.push({ text, completed })
@@ -26,12 +26,8 @@ const addToTaskList = (tasks, text, completed = false) =>
 const updateDB = (dbName, tasks) =>
   localStorage.setItem(dbName, JSON.stringify(tasks))
 
-const loadTasksFromDB = (dbName, tasks) => {
-  console.log(tasks)
-
-  tasks = JSON.parse(localStorage.getItem("tasks")) || []
-  console.log("json parse", JSON.parse(localStorage.getItem(dbName)))
-}
+const loadTasksFromDB = (dbName, tasks) =>
+  tasks.push(...(JSON.parse(localStorage.getItem("tasks")) || []))
 
 // UI logic
 
@@ -52,7 +48,7 @@ const addItems = (tasks, dbName) => {
 //Retrieve old tasks and display tasks and retrieve updated tasks
 
 const retrieveItems = () => {
-  tasks = JSON.parse(localStorage.getItem("tasks")) || []
+  // tasks = JSON.parse(localStorage.getItem("tasks")) || []
 
   $todoList.innerHTML = ""
   tasks.forEach((task, index) => {
@@ -228,22 +224,18 @@ const checkTheBox = () => {
 
 document.addEventListener("DOMContentLoaded", function () {
   loadTasksFromDB(DB_NAME, tasks)
-
+  
   retrieveItems()
 })
 
 $addButton.addEventListener("click", () => {
   addItems(tasks, DB_NAME)
-  loadTasksFromDB(DB_NAME, tasks)
-
   retrieveItems()
 })
 
 $inputBox.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     addItems(tasks, DB_NAME)
-    loadTasksFromDB(DB_NAME, tasks)
-
     retrieveItems()
   }
 })
