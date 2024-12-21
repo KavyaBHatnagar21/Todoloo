@@ -47,6 +47,18 @@ main {
   font: inherit;
 }
 
+.edit-input {
+  /* width: 290px;
+  height: 50px;
+  border-radius: 10px; */
+  border: 2px #fddbbb;
+  padding: 10px;
+  /* border: #fddbbb; */
+  background-color: #cdc1ff;
+  /* outline-style: none; */
+  font: inherit;
+}
+
 .add-button {
   width: 80px;
   height: 50px;
@@ -93,9 +105,15 @@ ul li {
   height: 20px;
 }
 
-.bin-img {
+.bin-img,
+.edit-icon-img {
   width: 20px;
   height: 20px;
+}
+
+.buttons-container {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .hidden {
