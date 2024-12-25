@@ -1,82 +1,180 @@
 "use strict"
 
-const todoList = document.querySelector(".todo-list")
-const todoListContainer = document.querySelector(".todo-list-container")
-const inputBox = document.querySelector(".input-box")
-const addButton = document.querySelector(".add-button")
+// DOM Elements
+const $todoList = document.querySelector(".todo-list")
+const $todoListContainer = document.querySelector(".todo-list-container")
+const $inputBox = document.querySelector(".input-box")
+const $addButton = document.querySelector(".add-button")
+
+// App constants
+
+const DB_NAME = "tasks"
+
+// Data structures
 
 let tasks = []
 
-document.addEventListener("DOMContentLoaded", function () {
-  retrieveItems()
-})
+// Data structures logic
 
-//Update task array and add that to the local storage
-const addItems = () => {
-  const newTask = inputBox.value
-  if (newTask === "") return
-  tasks.push({ text: newTask, completed: false })
-
-  localStorage.setItem("tasks", JSON.stringify(tasks))
-
-  inputBox.value = ""
+const addToTaskList = (tasks, text, completed = false) => {
+  const id = Date.now()
+  tasks.push({ id, text, completed })
+  return id
 }
 
-//Retrieve old tasks and display tasks and retrieve updated tasks
-const retrieveItems = () => {
-  tasks = JSON.parse(localStorage.getItem("tasks")) || []
-
-  todoList.innerHTML = ""
-  tasks.forEach((task, index) => {
-    todoList.innerHTML += `
-    <div class="item-container">
-        <div class="box-and-item-container">
-            <img src="./images/${
-              task.completed ? "checked-box.png" : "unchecked-box.png"
-            }" class="box-img" data-index="${index}" alt="check-boxes">
-            <li class="${task.completed ? "completed" : ""}">${task.text}</li>
-        </div>
-        <div class="buttons-container">
-            <img src="./images/edit-icon.png" class="edit-icon-img hidden" data-index="${index}" alt="edit icon">
-            <img src="./images/bin.png" class="bin-img hidden" data-index="${index}" alt="bin icon">
-        </div>
-    </div>
-      `
-  })
-
-  displayBinOnHover()
-  displayEditOnHover()
-  deleteTask()
-  editTask()
-  checkTheBox()
+const deleteFromTaskList = (id) => {
+  const index = tasks.findIndex((task) => id === task.id)
+  tasks.splice(index, 1)
 }
 
-const deleteTask = () => {
-  const binIcons = document.querySelectorAll(".bin-img")
-
-  binIcons.forEach((img) => {
-    img.addEventListener("click", function () {
-      const index = img.dataset.index
-      tasks.splice(index, 1)
-      localStorage.setItem("tasks", JSON.stringify(tasks))
-      retrieveItems()
-    })
-  })
+const toggleTaskCompletionInTaskList = (id) => {
+  const task = getTaskFromTaskList(id)
+  task.completed = !task.completed
 }
 
-const displayBinOnHover = () => {
-  const itemContainers = document.querySelectorAll(".item-container")
+const getTaskFromTaskList = (id) => tasks.find((task) => task.id === id)
 
-  itemContainers.forEach((item) => {
-    const binImg = item.querySelector(".bin-img")
+// Database logic
 
-    item.addEventListener("mouseover", function () {
-      binImg.classList.remove("hidden")
-    })
-    item.addEventListener("mouseout", function () {
-      binImg.classList.add("hidden")
-    })
+const updateTasksToDB = (dbName, tasks) =>
+  localStorage.setItem(dbName, JSON.stringify(tasks))
+
+const loadTasksFromDB = (dbName, tasks) =>
+  tasks.push(...(JSON.parse(localStorage.getItem(dbName)) || []))
+
+// UI logic
+
+const getInputBoxValue = () => $inputBox.value
+
+const isInputBoxEmpty = () => getInputBoxValue() === ""
+
+const clearInputBox = () => ($inputBox.value = "")
+
+const updateTaskInUI = (task) => {
+  const taskCard = getTaskCardFromUI(task.id)
+  const boxImg = taskCard.querySelector(".box-img")
+  boxImg.src = `./images/${
+    task.completed ? "checked-box.png" : "unchecked-box.png"
+  }`
+  const taskItem = taskCard.querySelector("li")
+  taskItem.textContent = task.text
+  if (task.completed) {
+    taskItem.classList.add("completed")
+  } else {
+    taskItem.classList.remove("completed")
+  }
+}
+
+const getTaskCardFromUI = (id) =>
+  $todoList.querySelector(`.item-container[data-id="${id}"]`)
+
+const createCheckBox = (task, id) => {
+  const checkBox = document.createElement("img")
+  checkBox.src = "./images/unchecked-box.png"
+  checkBox.classList.add("box-img")
+  checkBox.alt = "check-boxes"
+  checkBox.addEventListener("click", function () {
+    toggleTaskCompletionInTaskList(id)
+    updateTasksToDB(DB_NAME, tasks)
+    updateTaskInUI(task)
   })
+  return checkBox
+}
+
+const createTaskLabel = (task) => {
+  const taskLabel = document.createElement("li")
+  taskLabel.textContent = task.text
+  if (task.completed) {
+    taskLabel.classList.add("completed")
+  } else {
+    taskLabel.classList.remove("completed")
+  }
+  return taskLabel
+}
+
+const createCheckBoxAndLabelContainer = (task, id) => {
+  const checkBoxAndLabelContainer = document.createElement("div")
+  checkBoxAndLabelContainer.className = "box-and-item-container"
+  checkBoxAndLabelContainer.appendChild(createCheckBox(task, id))
+  checkBoxAndLabelContainer.appendChild(createTaskLabel(task))
+  return checkBoxAndLabelContainer
+}
+
+const createImgButton = (buttonName, id) => {
+  const imgButton = document.createElement("img")
+  imgButton.src = `./images/${buttonName}-icon.png`
+  imgButton.classList.add(`icon-btn`, "hidden")
+  imgButton.setAttribute("data-id", id)
+  imgButton.alt = `${buttonName} icon`
+  return imgButton
+}
+
+const createBinButton = (id, taskCard) => {
+  // Create bin button
+  const binIcon = createImgButton("bin", id)
+
+  // Attaching event listener
+  binIcon.addEventListener("click", function () {
+    deleteFromTaskList(id)
+    updateTasksToDB(DB_NAME, tasks)
+    deleteTaskFromUI(id)
+  })
+
+  taskCard.addEventListener("mouseover", function () {
+    binIcon.classList.remove("hidden")
+  })
+  taskCard.addEventListener("mouseout", function () {
+    binIcon.classList.add("hidden")
+  })
+
+  return binIcon
+}
+
+const createEditButton = (id, taskCard) => {
+  const editIcon = createImgButton("edit", id)
+
+  taskCard.addEventListener("mouseover", function () {
+    editIcon.classList.remove("hidden")
+  })
+  taskCard.addEventListener("mouseout", function () {
+    editIcon.classList.add("hidden")
+  })
+
+  return editIcon
+}
+
+const createTaskCardButtonsContainer = (id, taskCard) => {
+  const buttonsContainer = document.createElement("div")
+  buttonsContainer.classList.add("buttons-container")
+  buttonsContainer.appendChild(createEditButton(id, taskCard))
+  buttonsContainer.appendChild(createBinButton(id, taskCard))
+  return buttonsContainer
+}
+
+const addTaskToUI = (task) => {
+  const id = task.id
+  const taskCard = document.createElement("div")
+  taskCard.className = "item-container"
+  taskCard.setAttribute("data-id", id)
+  taskCard.appendChild(createCheckBoxAndLabelContainer(task, id))
+  taskCard.appendChild(createTaskCardButtonsContainer(id, taskCard))
+
+  $todoList.appendChild(taskCard)
+}
+
+// Delete tasks from the UI
+
+const deleteTaskFromUI = (id) => getTaskCardFromUI(id).remove()
+
+// App logic
+
+const addItems = (tasks, dbName) => {
+  if (!isInputBoxEmpty()) {
+    const id = addToTaskList(tasks, getInputBoxValue())
+    clearInputBox()
+    updateTasksToDB(dbName, tasks)
+    addTaskToUI(getTaskFromTaskList(id))
+  }
 }
 
 const editTask = () => {
@@ -165,42 +263,20 @@ const editTask = () => {
   })
 }
 
-const displayEditOnHover = () => {
-  const itemContainers = document.querySelectorAll(".item-container")
+// Event Listeners
 
-  itemContainers.forEach((item) => {
-    const editImg = item.querySelector(".edit-icon-img")
+document.addEventListener("DOMContentLoaded", function () {
+  loadTasksFromDB(DB_NAME, tasks)
 
-    item.addEventListener("mouseover", () => {
-      editImg.classList.remove("hidden")
-    })
-    item.addEventListener("mouseout", () => {
-      editImg.classList.add("hidden")
-    })
+  tasks.forEach((task) => {
+    addTaskToUI(task)
   })
-}
-
-const checkTheBox = () => {
-  const boxImg = document.querySelectorAll(".box-img")
-
-  boxImg.forEach((img) => {
-    img.addEventListener("click", function () {
-      const index = img.dataset.index
-      tasks[index].completed = !tasks[index].completed
-      localStorage.setItem("tasks", JSON.stringify(tasks))
-      retrieveItems()
-    })
-  })
-}
-
-addButton.addEventListener("click", () => {
-  addItems()
-  retrieveItems()
 })
 
-inputBox.addEventListener("keydown", (event) => {
+$addButton.addEventListener("click", () => addItems(tasks, DB_NAME))
+
+$inputBox.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
-    addItems()
-    retrieveItems()
+    addItems(tasks, DB_NAME)
   }
 })

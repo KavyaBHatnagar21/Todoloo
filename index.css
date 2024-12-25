@@ -48,15 +48,15 @@ main {
 }
 
 .edit-input {
-  /* width: 290px;
-  height: 50px;
-  border-radius: 10px; */
-  border: 2px #fddbbb;
-  padding: 10px;
-  /* border: #fddbbb; */
-  background-color: #cdc1ff;
-  /* outline-style: none; */
+  width: 200px;
+  height: 40px;
+  border-radius: 10px;
+  padding-left: 10px;
+  border: none;
+  background-color: #fddbbb;
+  outline-style: none;
   font: inherit;
+  margin-bottom: 10px;
 }
 
 .add-button {
@@ -105,8 +105,7 @@ ul li {
   height: 20px;
 }
 
-.bin-img,
-.edit-icon-img {
+.icon-btn {
   width: 20px;
   height: 20px;
 }
